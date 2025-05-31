@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto1/servicios/userService.dart';
 import 'package:proyecto1/widgets/menu.dart';
-//import 'package:proyecto1/widgets/usuario.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,53 +14,92 @@ class _LoginPageState extends State<LoginPage> {
   String usuario = '';
   String contrasena = '';
 
-  void _login() {
+  final UsuarioService usuarioService = UsuarioService();
+
+  bool _isLoading = false;
+
+  void _login() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // 👇 Aquí deberías validar contra una base de datos o servidor.
-      if (usuario == 'admin' && contrasena == '1234') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MenuPage()),
+      setState(() => _isLoading = true);
+
+      try {
+        final usuarios = await usuarioService.obtenerUsuarios();
+
+        var usuarioEncontrado = usuarios.firstWhere(
+          (u) => u['email'] == usuario.trim(),
+          orElse: () => null,
         );
-      } else {
+
+        if (usuarioEncontrado == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Usuario no encontrado')),
+          );
+          setState(() => _isLoading = false);
+          return;
+        }
+
+        if (usuarioEncontrado["contrasena"] == contrasena.trim()) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('usuarioId', usuarioEncontrado['id']);
+          await prefs.setBool('accesoTotal', usuarioEncontrado['accesoTotal']);
+          await prefs.setString('nombre', usuarioEncontrado['nombre']);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MenuPage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Contraseña incorrecta')),
+          );
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Credenciales inválidas')),
+          SnackBar(content: Text('Error de conexión: $e')),
         );
       }
+
+      setState(() => _isLoading = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Iniciar sesión')),
+      appBar: AppBar(title: const Text('Iniciar sesión')),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
+              Image.asset(
+                'assets/images/jds.png',
+                height: 150,
+              ),
+              SizedBox(height: 24),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Usuario'),
+                decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                keyboardType: TextInputType.emailAddress,
                 validator: (value) =>
-                    value!.isEmpty ? 'Ingrese el usuario' : null,
-                onSaved: (value) => usuario = value!,
+                    value!.isEmpty ? 'Ingrese el correo electrónico' : null,
+                onSaved: (value) => usuario = value ?? '',
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Contraseña'),
+                decoration: const InputDecoration(labelText: 'Contraseña'),
                 obscureText: true,
                 validator: (value) =>
                     value!.isEmpty ? 'Ingrese la contraseña' : null,
-                onSaved: (value) => contrasena = value!,
+                onSaved: (value) => contrasena = value ?? '',
               ),
-              SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _login,
-                child: Text('Acceder'),
-              ),
+              const SizedBox(height: 24),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: _login,
+                      child: const Text('Acceder'),
+                    ),
             ],
           ),
         ),

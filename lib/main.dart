@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'package:proyecto1/widgets/login.dart';
-import 'package:proyecto1/widgets/menu.dart';
+import 'package:proyecto1/widgets/login.dart';
+//import 'package:proyecto1/widgets/menu.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MenuPage(),
+      debugShowCheckedModeBanner: false,
+      home: LoginPage(),
     );
   }
 }
