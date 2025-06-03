@@ -1,90 +1,107 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/clases/orden.dart';
+import 'package:proyecto1/servicios/orderService.dart';
 
-class VerOrdenesPage extends StatelessWidget {
-  VerOrdenesPage({super.key});
-  final List<Orden> ordenes = [
-    Orden(
-      id: '1',
-      fechaHora: DateTime.now().subtract(Duration(days: 2)),
-      comentarioTecnico: 'Revisado y reparado problema de pantalla.',
-      tecnicoResponsable: 'Técnico A',
-      estadoEquipo: 'En proceso',
-    ),
-    Orden(
-      id: '2',
-      fechaHora: DateTime.now().subtract(Duration(days: 1)),
-      comentarioTecnico: 'Actualización del sistema operativo.',
-      tecnicoResponsable: 'Técnico B',
-      estadoEquipo: 'Listo para entrega',
-    ),
-    Orden(
-      id: '3',
-      fechaHora: DateTime.now().subtract(Duration(hours: 10)),
-      comentarioTecnico: 'Cambio de disco duro completado.',
-      tecnicoResponsable: 'Técnico C',
-      estadoEquipo: 'Recientemente entregado',
-    ),
-    Orden(
-      id: '4',
-      fechaHora: DateTime.now().subtract(Duration(days: 3)),
-      comentarioTecnico: 'Diagnóstico inicial.',
-      tecnicoResponsable: 'Técnico A',
-      estadoEquipo: 'En proceso',
-    ),
-    // Puedes añadir más órdenes
+class VerOrdenesPage extends StatefulWidget {
+  const VerOrdenesPage({super.key});
+
+  @override
+  State<VerOrdenesPage> createState() => _VerOrdenesPageState();
+}
+
+class _VerOrdenesPageState extends State<VerOrdenesPage> {
+  final OrdenService _ordenService = OrdenService();
+  List<Orden> todasOrdenes = [];
+  bool isLoading = true;
+
+  final List<String> estadosOrden = [
+    'En proceso',
+    'Listo para entrega',
+    'Recientemente entregado',
   ];
 
-  // Agrupa las órdenes por estado
   Map<String, List<Orden>> _agruparPorEstado(List<Orden> lista) {
     Map<String, List<Orden>> mapa = {};
     for (var orden in lista) {
-      mapa.putIfAbsent(orden.estadoEquipo, () => []);
-      mapa[orden.estadoEquipo]!.add(orden);
+      mapa.putIfAbsent(orden.estado, () => []);
+      mapa[orden.estado]!.add(orden);
     }
     return mapa;
   }
 
+  Future<void> cargarOrdenes() async {
+    try {
+      final respuesta = await _ordenService.obtenerOrdenes();
+      final ordenes = respuesta.map<Orden>((json) => Orden.fromJson(json)).toList();
+      setState(() {
+        todasOrdenes = ordenes;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cargar órdenes: $e')));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    cargarOrdenes();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Map<String, List<Orden>> ordenesPorEstado = _agruparPorEstado(ordenes);
-
-    // Estados ordenados para mostrar en ese orden
-    final List<String> estadosOrden = [
-      'En proceso',
-      'Listo para entrega',
-      'Recientemente entregado'
-    ];
+    final ordenesPorEstado = _agruparPorEstado(todasOrdenes);
 
     return Scaffold(
       appBar: AppBar(title: Text('Órdenes por Estado')),
-      body: ListView.builder(
-        itemCount: estadosOrden.length,
-        itemBuilder: (context, index) {
-          final estado = estadosOrden[index];
-          final listaEstado = ordenesPorEstado[estado] ?? [];
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: cargarOrdenes,
+              child: ListView.builder(
+                itemCount: estadosOrden.length,
+                itemBuilder: (context, index) {
+                  final estado = estadosOrden[index];
+                  final listaEstado = ordenesPorEstado[estado] ?? [];
 
-          return ExpansionTile(
-            title: Text('$estado (${listaEstado.length})'),
-            initiallyExpanded: true,
-            children: listaEstado.isEmpty
-                ? [ListTile(title: Text('No hay órdenes'))]
-                : listaEstado.map((orden) {
-                    return ListTile(
-                      leading: Icon(Icons.computer),
-                      title: Text('Técnico: ${orden.tecnicoResponsable}'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Fecha: ${orden.fechaHora.toLocal().toString().split(".")[0]}'),
-                          Text('Nota: ${orden.comentarioTecnico}'),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-          );
-        },
-      ),
+                  return ExpansionTile(
+                    title: Text('$estado (${listaEstado.length})'),
+                    initiallyExpanded: true,
+                    children: listaEstado.isEmpty
+                        ? [ListTile(title: Text('No hay órdenes'))]
+                        : listaEstado.map((orden) {
+                            return Card(
+                              margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              child: ListTile(
+                                leading: Icon(Icons.build),
+                                title: Text('Orden ID: ${orden.id}'),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Nombre cliente: ${orden.nombreCliente}'),
+                                    Text('Teléfono: ${orden.telefonoCliente}'),
+                                    Text('Email: ${orden.emailCliente}'),
+                                    Text('Modelo PC: ${orden.modeloPc}'),
+                                    Text('Serie PC: ${orden.numeroSeriePc}'),
+                                    Text('Estado inicial: ${orden.estadoInicial}'),
+                                    Text('Accesorios: ${orden.accesoriosEntregados}'),
+                                    Text('Estado actual: ${orden.estado}'),
+                                    Text('Fecha ingreso: ${orden.fechaHora.toLocal().toString().split(".")[0]}'),
+                                  ],
+                                ),
+                                onTap: () {
+                                  // Acción futura aquí
+                                },
+                              ),
+                            );
+                          }).toList(),
+                  );
+                },
+              ),
+            ),
     );
   }
 }

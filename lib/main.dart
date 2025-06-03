@@ -18,6 +18,9 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
+      routes: {
+        '/login': (context) => LoginPage()
+      },
     );
   }
 }

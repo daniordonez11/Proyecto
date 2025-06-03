@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/servicios/userService.dart';
 import 'package:proyecto1/widgets/menu.dart';
+import 'package:proyecto1/widgets/validarOrden.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   @override
   _LoginPageState createState() => _LoginPageState();
+  
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -45,10 +47,18 @@ class _LoginPageState extends State<LoginPage> {
           await prefs.setInt('usuarioId', usuarioEncontrado['id']);
           await prefs.setBool('accesoTotal', usuarioEncontrado['accesoTotal']);
           await prefs.setString('nombre', usuarioEncontrado['nombre']);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MenuPage()),
+          if (usuarioEncontrado['accesoTotal'] == true) {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MenuPage()),
           );
+          } else {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ValidarOrdenPage()),
+          );   
+        }
+
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Contraseña incorrecta')),

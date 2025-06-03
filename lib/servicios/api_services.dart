@@ -50,7 +50,6 @@ class ApiService {
     }
   }
 
-  // DELETE
   Future<dynamic> delete(String endpoint) async {
     final url = Uri.parse('$baseUrl$endpoint');
     try {
@@ -61,7 +60,6 @@ class ApiService {
     }
   }
 
-  // Manejo básico de respuesta
   dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return json.decode(response.body);
