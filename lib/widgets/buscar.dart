@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/clases/orden.dart';
 import 'package:proyecto1/servicios/orderService.dart';
+import 'package:proyecto1/widgets/editarOrden.dart';
 
 class BuscarOrdenPage extends StatefulWidget {
   const BuscarOrdenPage({super.key});
@@ -18,18 +19,28 @@ class _BuscarOrdenPageState extends State<BuscarOrdenPage> {
   DateTime? filtroFecha;
   String busqueda = '';
 
-  List<String> estados = ['Todos', 'En proceso', 'Listo para entrega', 'Recientemente entregado'];
+  List<String> estados = [
+    'Todos',
+    'Recien llegada',
+    'En proceso',
+    'Listo para entrega',
+    'Recientemente entregado',
+  ];
   List<String> tecnicos = ['Todos'];
 
   List<Orden> get ordenesFiltradas {
     return todasOrdenes.where((orden) {
-      final cumpleEstado = filtroEstado == 'Todos' || orden.estado == filtroEstado;
-      final cumpleTecnico = filtroTecnico == 'Todos'; // No hay técnico en la nueva estructura
-      final cumpleFecha = filtroFecha == null ||
+      final cumpleEstado =
+          filtroEstado == 'Todos' || orden.estado == filtroEstado;
+      final cumpleTecnico =
+          filtroTecnico == 'Todos'; // No hay técnico en la nueva estructura
+      final cumpleFecha =
+          filtroFecha == null ||
           (orden.fechaHora.year == filtroFecha!.year &&
               orden.fechaHora.month == filtroFecha!.month &&
               orden.fechaHora.day == filtroFecha!.day);
-      final cumpleBusqueda = busqueda.isEmpty ||
+      final cumpleBusqueda =
+          busqueda.isEmpty ||
           orden.nombreCliente.toLowerCase().contains(busqueda.toLowerCase()) ||
           orden.id.contains(busqueda);
       return cumpleEstado && cumpleTecnico && cumpleFecha && cumpleBusqueda;
@@ -39,7 +50,8 @@ class _BuscarOrdenPageState extends State<BuscarOrdenPage> {
   Future<void> cargarOrdenes() async {
     try {
       final respuesta = await _ordenService.obtenerOrdenes();
-      final ordenes = respuesta.map<Orden>((json) => Orden.fromJson(json)).toList();
+      final ordenes =
+          respuesta.map<Orden>((json) => Orden.fromJson(json)).toList();
 
       setState(() {
         todasOrdenes = ordenes;
@@ -49,7 +61,9 @@ class _BuscarOrdenPageState extends State<BuscarOrdenPage> {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -97,69 +111,80 @@ class _BuscarOrdenPageState extends State<BuscarOrdenPage> {
             icon: Icon(Icons.clear),
             onPressed: _limpiarFiltros,
             tooltip: 'Limpiar filtros',
-          )
+          ),
         ],
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: cargarOrdenes,
-              child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Buscar por ID o nombre del cliente',
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
+      body:
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : RefreshIndicator(
+                onRefresh: cargarOrdenes,
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Buscar por ID o nombre del cliente',
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (val) => setState(() => busqueda = val),
                       ),
-                      onChanged: (val) => setState(() => busqueda = val),
-                    ),
-                    SizedBox(height: 15),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField<String>(
-                            value: filtroEstado,
-                            items: estados
-                                .map((e) => DropdownMenuItem(child: Text(e), value: e))
-                                .toList(),
-                            onChanged: (val) => setState(() => filtroEstado = val ?? 'Todos'),
-                            decoration: InputDecoration(labelText: 'Estado'),
+                      SizedBox(height: 15),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: filtroEstado,
+                              items:
+                                  estados
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          child: Text(e),
+                                          value: e,
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged:
+                                  (val) => setState(
+                                    () => filtroEstado = val ?? 'Todos',
+                                  ),
+                              decoration: InputDecoration(labelText: 'Estado'),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            filtroFecha == null
-                                ? 'Fecha ingreso: Todos'
-                                : 'Fecha ingreso: ${filtroFecha!.toLocal().toString().split(' ')[0]}',
-                            style: TextStyle(fontSize: 16),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              filtroFecha == null
+                                  ? 'Fecha ingreso: Todos'
+                                  : 'Fecha ingreso: ${filtroFecha!.toLocal().toString().split(' ')[0]}',
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => _seleccionarFecha(context),
-                          child: Text('Seleccionar fecha'),
-                        ),
-                        if (filtroFecha != null)
-                          IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () => setState(() => filtroFecha = null),
-                            tooltip: 'Limpiar fecha',
+                          ElevatedButton(
+                            onPressed: () => _seleccionarFecha(context),
+                            child: Text('Seleccionar fecha'),
                           ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    ordenesFiltradas.isEmpty
-                        ? Center(child: Text('No se encontraron órdenes'))
-                        : ListView.builder(
+                          if (filtroFecha != null)
+                            IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed:
+                                  () => setState(() => filtroFecha = null),
+                              tooltip: 'Limpiar fecha',
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      ordenesFiltradas.isEmpty
+                          ? Center(child: Text('No se encontraron órdenes'))
+                          : ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: ordenesFiltradas.length,
@@ -171,30 +196,49 @@ class _BuscarOrdenPageState extends State<BuscarOrdenPage> {
                                   leading: Icon(Icons.build),
                                   title: Text('Orden ID: ${orden.id}'),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text('Nombre cliente: ${orden.nombreCliente}'),
-                                      Text('Teléfono: ${orden.telefonoCliente}'),
+                                      Text(
+                                        'Nombre cliente: ${orden.nombreCliente}',
+                                      ),
+                                      Text(
+                                        'Teléfono: ${orden.telefonoCliente}',
+                                      ),
                                       Text('Email: ${orden.emailCliente}'),
                                       Text('Modelo PC: ${orden.modeloPc}'),
                                       Text('Serie PC: ${orden.numeroSeriePc}'),
-                                      Text('Estado inicial: ${orden.estadoInicial}'),
-                                      Text('Accesorios: ${orden.accesoriosEntregados}'),
+                                      Text(
+                                        'Estado inicial: ${orden.estadoInicial}',
+                                      ),
+                                      Text(
+                                        'Accesorios: ${orden.accesoriosEntregados}',
+                                      ),
                                       Text('Estado actual: ${orden.estado}'),
-                                      Text('Fecha ingreso: ${orden.fechaHora.toLocal().toString().split(".")[0]}'),
+                                      Text(
+                                        'Fecha ingreso: ${orden.fechaHora.toLocal().toString().split(".")[0]}',
+                                      ),
                                     ],
                                   ),
                                   onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                editarOrden(orden: orden),
+                                      ),
+                                    );
                                     // Acción futura
                                   },
                                 ),
                               );
                             },
                           ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
     );
   }
 }

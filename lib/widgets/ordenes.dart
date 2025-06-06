@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/clases/orden.dart';
 import 'package:proyecto1/servicios/orderService.dart';
+import 'package:proyecto1/widgets/editarOrden.dart';
 
 class VerOrdenesPage extends StatefulWidget {
   const VerOrdenesPage({super.key});
@@ -15,6 +16,7 @@ class _VerOrdenesPageState extends State<VerOrdenesPage> {
   bool isLoading = true;
 
   final List<String> estadosOrden = [
+    'Recien llegada',
     'En proceso',
     'Listo para entrega',
     'Recientemente entregado',
@@ -41,7 +43,9 @@ class _VerOrdenesPageState extends State<VerOrdenesPage> {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cargar órdenes: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar órdenes: $e')),
+      );
     }
   }
 
@@ -92,8 +96,14 @@ class _VerOrdenesPageState extends State<VerOrdenesPage> {
                                     Text('Fecha ingreso: ${orden.fechaHora.toLocal().toString().split(".")[0]}'),
                                   ],
                                 ),
-                                onTap: () {
-                                  // Acción futura aquí
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => editarOrden(orden: orden),
+                                    ),
+                                  );
+                                  await cargarOrdenes(); // Recarga después de editar
                                 },
                               ),
                             );

@@ -4,7 +4,7 @@ import 'dart:convert';
 class ApiService {
   //10.0.2.2 PARA EMULACION
   //localhost para emular web
-  static const String baseUrl = 'http://localhost:3000/api/v1/auth/';
+  static const String baseUrl = 'http://10.0.2.2:3000/api/v1/auth/';
 
   // Encabezados comunes
   Map<String, String> headers = {

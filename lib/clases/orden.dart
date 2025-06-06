@@ -1,4 +1,5 @@
 class Orden {
+  final int usuarioId;
   final String id;
   final String nombreCliente;
   final int telefonoCliente;
@@ -11,6 +12,7 @@ class Orden {
   final DateTime fechaHora;
 
   Orden({
+    required this.usuarioId,
     required this.id,
     required this.nombreCliente,
     required this.telefonoCliente,
@@ -25,6 +27,7 @@ class Orden {
 
   factory Orden.fromJson(Map<String, dynamic> json) {
     return Orden(
+      usuarioId: json['usuarioId'] ?? 0,
       id: json['id'].toString(),
       nombreCliente: json['nombreCliente'] ?? '',
       telefonoCliente: json['telefonoCliente'] ?? '',

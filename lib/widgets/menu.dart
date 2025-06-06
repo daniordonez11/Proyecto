@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/widgets/ingreso.dart';
+import 'package:proyecto1/widgets/inventario.dart';
 import 'package:proyecto1/widgets/login.dart';
 import 'package:proyecto1/widgets/ordenes.dart';
 import 'package:proyecto1/widgets/buscar.dart';
@@ -105,6 +106,17 @@ class _MenuPageState extends State<MenuPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => BuscarOrdenPage()),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.inventory),
+              label: const Text('Ver Inventario'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InventarioPage()),
                 );
               },
             ),
