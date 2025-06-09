@@ -31,7 +31,7 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
   String modeloPc = '';
   int numeroSeriePc = 0;
   String estadoInicial = '';
-  String estado = 'Recien llegada';
+  String estado = 'Recien llegado';
   List<String> accesoriosSeleccionados = [];
 
   final List<String> accesoriosOpciones = [

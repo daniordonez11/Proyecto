@@ -1,6 +1,6 @@
 class Orden {
   final int usuarioId;
-  final String id;
+  final int id;
   final String nombreCliente;
   final int telefonoCliente;
   final String emailCliente;
@@ -27,13 +27,13 @@ class Orden {
 
   factory Orden.fromJson(Map<String, dynamic> json) {
     return Orden(
-      usuarioId: json['usuarioId'] ?? 0,
-      id: json['id'].toString(),
+      usuarioId: int.tryParse(json['usuarioId'].toString()) ?? 0,
+      id: int.tryParse(json['id'].toString()) ?? 0,
       nombreCliente: json['nombreCliente'] ?? '',
-      telefonoCliente: json['telefonoCliente'] ?? '',
+      telefonoCliente: int.tryParse(json['telefonoCliente'].toString()) ?? 0,
       emailCliente: json['emailCliente'] ?? '',
       modeloPc: json['modeloPc'] ?? '',
-      numeroSeriePc: json['numeroSeriePc'] ?? '',
+      numeroSeriePc: int.tryParse(json['numeroSeriePc'].toString()) ?? 0,
       estadoInicial: json['estadoInicial'] ?? '',
       accesoriosEntregados: json['accesoriosEntregados'] ?? '',
       estado: json['estado'] ?? '',

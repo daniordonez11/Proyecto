@@ -48,6 +48,7 @@ class _editarOrdenState extends State<editarOrden> {
   ];
 
   final List<String> opcionesEstado = [
+    "Recien llegada",
     'En proceso',
     'Listo para entrega',
     'Recientemente entregado',
@@ -95,7 +96,7 @@ class _editarOrdenState extends State<editarOrden> {
   Future<void> cargarImagenesDeOrden() async {
     try {
       final imgs = await imageService.obtenerImagenesPorOrden(
-        int.parse(widget.orden.id),
+        widget.orden.id,
       );
       setState(() {
         imagenesOrden = imgs;
@@ -118,7 +119,7 @@ class _editarOrdenState extends State<editarOrden> {
       final File file = File(pickedFile.path);
       final exito = await imageService.subirArchivoImagen(
         file,
-        int.parse(widget.orden.id),
+        widget.orden.id,
       );
       if (exito) {
         await cargarImagenesDeOrden();
@@ -167,7 +168,7 @@ class _editarOrdenState extends State<editarOrden> {
       };
 
       try {
-        await _ordenService.actualizarOrden(int.parse(widget.orden.id), data);
+        await _ordenService.actualizarOrden(widget.orden.id, data);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Orden actualizada correctamente')),
         );

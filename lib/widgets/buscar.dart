@@ -42,7 +42,7 @@ class _BuscarOrdenPageState extends State<BuscarOrdenPage> {
       final cumpleBusqueda =
           busqueda.isEmpty ||
           orden.nombreCliente.toLowerCase().contains(busqueda.toLowerCase()) ||
-          orden.id.contains(busqueda);
+          orden.id.toString().contains(busqueda);
       return cumpleEstado && cumpleTecnico && cumpleFecha && cumpleBusqueda;
     }).toList();
   }
