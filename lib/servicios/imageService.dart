@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';

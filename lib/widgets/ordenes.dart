@@ -16,7 +16,7 @@ class _VerOrdenesPageState extends State<VerOrdenesPage> {
   bool isLoading = true;
 
   final List<String> estadosOrden = [
-    'Recien llegada',
+    'Recien llegado',
     'En proceso',
     'Listo para entrega',
     'Recientemente entregado',

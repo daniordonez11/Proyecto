@@ -1,10 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto1/servicios/imageService.dart';
 import 'package:proyecto1/servicios/orderService.dart';
-import 'package:proyecto1/servicios/userService.dart'; // <-- NUEVO
+import 'package:proyecto1/servicios/userService.dart';
 
 class RegistroEquipos extends StatefulWidget {
   const RegistroEquipos({super.key});
@@ -24,13 +23,7 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
   int? usuarioIdSeleccionado;
   List<Map<String, dynamic>> usuariosConAcceso = [];
 
-  String nombreCliente = '';
-  int telefonoCliente = 0;
-  String emailCliente = '';
   DateTime fechaHora = DateTime.now();
-  String modeloPc = '';
-  int numeroSeriePc = 0;
-  String estadoInicial = '';
   String estado = 'Recien llegado';
   List<String> accesoriosSeleccionados = [];
 
@@ -42,10 +35,36 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
     'Otro',
   ];
 
+  // Controladores de texto
+  late TextEditingController nombreController;
+  late TextEditingController telefonoController;
+  late TextEditingController emailController;
+  late TextEditingController modeloController;
+  late TextEditingController serieController;
+  late TextEditingController estadoController;
+
   @override
   void initState() {
     super.initState();
     cargarUsuariosConAccesoTotal();
+
+    nombreController = TextEditingController();
+    telefonoController = TextEditingController();
+    emailController = TextEditingController();
+    modeloController = TextEditingController();
+    serieController = TextEditingController();
+    estadoController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    nombreController.dispose();
+    telefonoController.dispose();
+    emailController.dispose();
+    modeloController.dispose();
+    serieController.dispose();
+    estadoController.dispose();
+    super.dispose();
   }
 
   Future<void> cargarUsuariosConAccesoTotal() async {
@@ -97,12 +116,17 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
         return;
       }
 
-      _formKey.currentState!.save();
+      // Obtener valores desde los controladores
+      final nombreCliente = nombreController.text;
+      final telefonoCliente = int.tryParse(telefonoController.text) ?? 0;
+      final emailCliente = emailController.text;
+      final modeloPc = modeloController.text;
+      final numeroSeriePc = int.tryParse(serieController.text) ?? 0;
+      final estadoInicial = estadoController.text;
 
-      String accesoriosEntregados =
-          accesoriosSeleccionados.isEmpty
-              ? 'NINGUNO'
-              : accesoriosSeleccionados.join(', ');
+      String accesoriosEntregados = accesoriosSeleccionados.isEmpty
+          ? 'NINGUNO'
+          : accesoriosSeleccionados.join(', ');
 
       Map<String, dynamic> nuevaOrden = {
         "usuarioId": usuarioIdSeleccionado,
@@ -118,18 +142,15 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
       };
 
       try {
-        // Crear orden y obtener respuesta con id
         final respuesta = await _ordenService.crearOrden(nuevaOrden);
         final int ordenId = respuesta['id'];
 
-        // Subir imágenes asociadas a esa ordenId
         for (File imagen in imagenesSeleccionadas) {
           bool exito = await _imageService.subirArchivoImagen(imagen, ordenId);
           if (!exito) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error al subir una imagen')),
             );
-            // Aquí puedes decidir si continuar o abortar
           }
         }
 
@@ -138,9 +159,9 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
         );
         Navigator.pop(context);
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al crear orden: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al crear orden: $e')),
+        );
       }
     }
   }
@@ -164,13 +185,12 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
               DropdownButtonFormField<int>(
                 decoration: InputDecoration(labelText: 'Técnico responsable'),
                 value: usuarioIdSeleccionado,
-                items:
-                    usuariosConAcceso.map((usuario) {
-                      return DropdownMenuItem<int>(
-                        value: usuario['id'],
-                        child: Text(usuario['nombre']),
-                      );
-                    }).toList(),
+                items: usuariosConAcceso.map((usuario) {
+                  return DropdownMenuItem<int>(
+                    value: usuario['id'],
+                    child: Text(usuario['nombre']),
+                  );
+                }).toList(),
                 onChanged: (value) {
                   setState(() {
                     usuarioIdSeleccionado = value;
@@ -180,24 +200,24 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
                     (value) => value == null ? 'Seleccione un técnico' : null,
               ),
               TextFormField(
+                controller: nombreController,
                 decoration: InputDecoration(labelText: 'Nombre del cliente'),
                 validator:
                     (value) => value!.isEmpty ? 'Ingrese el nombre' : null,
-                onSaved: (value) => nombreCliente = value!,
               ),
               TextFormField(
+                controller: telefonoController,
                 decoration: InputDecoration(labelText: 'Teléfono'),
                 keyboardType: TextInputType.number,
                 validator:
                     (value) => value!.isEmpty ? 'Ingrese el teléfono' : null,
-                onSaved: (value) => telefonoCliente = int.parse(value!),
               ),
               TextFormField(
+                controller: emailController,
                 decoration: InputDecoration(labelText: 'Correo electrónico'),
                 keyboardType: TextInputType.emailAddress,
                 validator:
                     (value) => value!.isEmpty ? 'Ingrese el correo' : null,
-                onSaved: (value) => emailCliente = value!,
               ),
               SizedBox(height: 16),
               Text(
@@ -208,24 +228,22 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
                 child: Text('Seleccionar fecha'),
               ),
               TextFormField(
+                controller: modeloController,
                 decoration: InputDecoration(labelText: 'Marca y modelo'),
                 validator:
-                    (value) =>
-                        value!.isEmpty ? 'Ingrese la marca y modelo' : null,
-                onSaved: (value) => modeloPc = value!,
+                    (value) => value!.isEmpty ? 'Ingrese la marca y modelo' : null,
               ),
               TextFormField(
+                controller: serieController,
                 decoration: InputDecoration(labelText: 'Número de serie o ID'),
                 keyboardType: TextInputType.number,
                 validator:
-                    (value) =>
-                        value!.isEmpty ? 'Ingrese el número de serie' : null,
-                onSaved: (value) => numeroSeriePc = int.parse(value!),
+                    (value) => value!.isEmpty ? 'Ingrese el número de serie' : null,
               ),
               TextFormField(
+                controller: estadoController,
                 decoration: InputDecoration(labelText: 'Estado inicial'),
                 maxLines: 3,
-                onSaved: (value) => estadoInicial = value ?? '',
               ),
               ElevatedButton.icon(
                 onPressed: seleccionarImagenes,
@@ -235,18 +253,18 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
               imagenesSeleccionadas.isEmpty
                   ? Text('No hay imágenes seleccionadas')
                   : SizedBox(
-                    height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: imagenesSeleccionadas.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Image.file(imagenesSeleccionadas[index]),
-                        );
-                      },
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: imagenesSeleccionadas.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Image.file(imagenesSeleccionadas[index]),
+                          );
+                        },
+                      ),
                     ),
-                  ),
               SizedBox(height: 16),
               Text('Accesorios entregados'),
               ...accesoriosOpciones.map((item) {

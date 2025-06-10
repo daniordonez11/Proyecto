@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:proyecto1/clases/orden.dart';
 import 'package:proyecto1/clases/usuario.dart';
 import 'package:proyecto1/servicios/imageService.dart';
@@ -48,7 +52,7 @@ class _editarOrdenState extends State<editarOrden> {
   ];
 
   final List<String> opcionesEstado = [
-    "Recien llegada",
+    "Recien llegado",
     'En proceso',
     'Listo para entrega',
     'Recientemente entregado',
@@ -318,39 +322,82 @@ class _editarOrdenState extends State<editarOrden> {
                         : imagenesOrden.isEmpty
                             ? Text('No hay imágenes')
                             : SizedBox(
-                                height: 150,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: imagenesOrden.length,
-                                  itemBuilder: (context, index) {
-                                    final img = imagenesOrden[index];
-                                    return Stack(
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.symmetric(horizontal: 8),
-                                          child: Image.network(
-                                            img['urlImagen'],
-                                            width: 150,
-                                            height: 150,
-                                            fit: BoxFit.cover,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: 0,
-                                          top: 0,
-                                          child: IconButton(
-                                            icon: Icon(Icons.delete, color: Colors.red),
-                                            onPressed: () => _eliminarImagen(img['id']),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
+  height: 150,
+  child: ListView.builder(
+    scrollDirection: Axis.horizontal,
+    itemCount: imagenesOrden.length,
+    itemBuilder: (context, index) {
+      final img = imagenesOrden[index];
+      return Stack(
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 8),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => Scaffold(
+                      appBar: AppBar(title: Text('Vista de imagen')),
+                      body: Center(
+                        child: PhotoView(
+                          imageProvider: NetworkImage(img['urlImagen']),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: Image.network(
+                img['urlImagen'],
+                width: 150,
+                height: 150,
+                fit: BoxFit.cover,
+              ),
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            top: 0,
+            child: IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: () => _eliminarImagen(img['id']),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: IconButton(
+              icon: Icon(Icons.download, color: Colors.green),
+              onPressed: () async {
+                try {
+                  var response = await Dio().get(
+                    img['urlImagen'],
+                    options: Options(responseType: ResponseType.bytes),
+                  );
+                  final result = await ImageGallerySaver.saveImage(
+                    Uint8List.fromList(response.data),
+                    quality: 80,
+                    name: "orden_${widget.orden.id}_img_$index",
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Imagen guardada en galería')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error al guardar imagen: $e')),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      );
+    },
+  ),
+                            ),
                     SizedBox(height: 10),
                     ElevatedButton.icon(
                       icon: Icon(Icons.add_a_photo),

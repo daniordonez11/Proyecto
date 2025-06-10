@@ -21,7 +21,7 @@ class _BuscarOrdenPageState extends State<BuscarOrdenPage> {
 
   List<String> estados = [
     'Todos',
-    'Recien llegada',
+    'Recien llegado',
     'En proceso',
     'Listo para entrega',
     'Recientemente entregado',

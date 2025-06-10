@@ -57,7 +57,7 @@ class _MenuPageState extends State<MenuPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Menú Principal - ID de Usuario: $usuarioId - Nombre: $nombre'),
+      appBar: AppBar(title: Text('Menú Principal - ID de Usuario: $usuarioId - Nombre: $nombre', style: TextStyle(fontSize: 8)),
       actions: [
     IconButton(
       icon: const Icon(Icons.logout),
