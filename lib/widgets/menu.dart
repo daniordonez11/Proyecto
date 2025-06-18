@@ -76,7 +76,7 @@ class _MenuPageState extends State<MenuPage> {
             ),
         const DrawerHeader(
           decoration: BoxDecoration(
-            color: Colors.green,
+            color: Color(0xFF0B4B30),
           ),
           child: Text(
             'Menú',
@@ -117,86 +117,95 @@ class _MenuPageState extends State<MenuPage> {
       ],
     ),
   ),
-      body: Container(
-        decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/fondo.jpeg"),
+    body: Stack(
+      children: [
+        SizedBox.expand(
+          child: Image.asset(
+            'assets/images/fondo.png',
+            width: double.infinity, 
+            height: double.infinity, 
+            fit: BoxFit.fill,
+            color: Colors.black.withOpacity(0.5), 
+            colorBlendMode: BlendMode.darken, 
+          ),
+        ),
+        Container(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/jds.png',
+                  height: 100,
+                ),
+                const SizedBox(height: 100),
+
+                if (accesoTotal == true) ...[
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF0B4B30),
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.computer),
+                    label: const Text('Registrar equipo'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegistroEquipos()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF0B4B30),
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.list_alt),
+                    label: const Text('Clasificacion de Ordenes'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => VerOrdenesPage()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                ],
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF0B4B30),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.search),
+                  label: const Text('Buscar Orden'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => BuscarOrdenPage()),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF0B4B30),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.inventory),
+                  label: const Text('Ver Inventario'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InventarioPage()),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/jds.png',
-                height: 100,
-              ),
-              const SizedBox(height: 100),
-
-            if (accesoTotal == true) ...[
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
-                icon: const Icon(Icons.computer),
-                label: const Text('Registrar equipo'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegistroEquipos()),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
-                icon: const Icon(Icons.list_alt),
-                label: const Text('Clasificacion de Ordenes'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => VerOrdenesPage()),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-            ],
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
-              icon: const Icon(Icons.search),
-              label: const Text('Buscar Orden'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BuscarOrdenPage()),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
-              icon: const Icon(Icons.inventory),
-              label: const Text('Ver Inventario'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InventarioPage()),
-                );
-              },
-            ),
-          ],
         ),
-      ),
+      ],
     ),
     );
   }

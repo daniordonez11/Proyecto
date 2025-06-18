@@ -109,61 +109,70 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
 
   Future<void> guardarOrden() async {
     if (_formKey.currentState!.validate()) {
-      if (usuarioIdSeleccionado == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Debe seleccionar un técnico responsable')),
-        );
-        return;
-      }
-
-      // Obtener valores desde los controladores
-      final nombreCliente = nombreController.text;
-      final telefonoCliente = int.tryParse(telefonoController.text) ?? 0;
-      final emailCliente = emailController.text;
-      final modeloPc = modeloController.text;
-      final numeroSeriePc = int.tryParse(serieController.text) ?? 0;
-      final estadoInicial = estadoController.text;
-
-      String accesoriosEntregados = accesoriosSeleccionados.isEmpty
-          ? 'NINGUNO'
-          : accesoriosSeleccionados.join(', ');
-
-      Map<String, dynamic> nuevaOrden = {
-        "usuarioId": usuarioIdSeleccionado,
-        "nombreCliente": nombreCliente,
-        "telefonoCliente": telefonoCliente,
-        "emailCliente": emailCliente,
-        "fechaHora": fechaHora.toIso8601String(),
-        "modeloPc": modeloPc,
-        "numeroSeriePc": numeroSeriePc,
-        "estadoInicial": estadoInicial,
-        "estado": estado,
-        "accesoriosEntregados": accesoriosEntregados,
-      };
-
-      try {
-        final respuesta = await _ordenService.crearOrden(nuevaOrden);
-        final int ordenId = respuesta['id'];
-
-        for (File imagen in imagenesSeleccionadas) {
-          bool exito = await _imageService.subirArchivoImagen(imagen, ordenId);
-          if (!exito) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error al subir una imagen')),
-            );
-          }
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Orden creada correctamente con imágenes')),
-        );
-        Navigator.pop(context);
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al crear orden: $e')),
-        );
-      }
+    if (usuarioIdSeleccionado == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Debe seleccionar un técnico responsable')),
+      );
+      return;
     }
+
+    // Valores del formulario
+    final nombreCliente = nombreController.text.trim();
+    final telefonoCliente = int.tryParse(telefonoController.text.trim()) ?? 0;
+    final emailCliente = emailController.text.trim();
+    final modeloPc = modeloController.text.trim();
+    final numeroSeriePc = int.tryParse(serieController.text.trim()) ?? 0;
+    final estadoInicial = estadoController.text.trim();
+
+    // Validación extra para email (opcional pero recomendable)
+    if (!RegExp(r"^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(emailCliente)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ingrese un correo electrónico válido')),
+      );
+      return;
+    }
+
+    String accesoriosEntregados = accesoriosSeleccionados.isEmpty
+        ? 'NINGUNO'
+        : accesoriosSeleccionados.join(', ');
+
+    Map<String, dynamic> nuevaOrden = {
+      "usuarioId": usuarioIdSeleccionado,
+      "nombreCliente": nombreCliente,
+      "telefonoCliente": telefonoCliente,
+      "emailCliente": emailCliente,
+      "modeloPc": modeloPc,
+      "numeroSeriePc": numeroSeriePc,
+      "estadoInicial": estadoInicial,
+      "estado": estado,
+      "accesoriosEntregados": accesoriosEntregados,
+    };
+
+    try {
+      // Crear la orden
+      final respuesta = await _ordenService.crearOrden(nuevaOrden);
+      final int ordenId = respuesta['id'];
+
+      // Subir imágenes
+      for (File imagen in imagenesSeleccionadas) {
+        bool exito = await _imageService.subirArchivoImagen(imagen, ordenId);
+        if (!exito) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al subir una imagen')),
+          );
+        }
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Orden creada correctamente con imágenes')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al crear orden: $e')),
+      );
+    }
+  }
   }
 
   @override
@@ -176,12 +185,25 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
+      body: 
+      Stack(
+        children: [
+          SizedBox.expand(
+            child: Image.asset(
+              'assets/images/fondo.png',
+              width: double.infinity, // ancho máximo posible
+              height: double.infinity, // alto máximo posible
+              fit: BoxFit.fill,
+              color: Colors.black.withOpacity(0.5), // opacidad del fondo
+              colorBlendMode: BlendMode.darken, // modo de mezcla del color
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
               DropdownButtonFormField<int>(
                 decoration: InputDecoration(labelText: 'Técnico responsable'),
                 value: usuarioIdSeleccionado,
@@ -292,6 +314,10 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
           ),
         ),
       ),
+        ],
+      ),
+      
     );
+
   }
 }

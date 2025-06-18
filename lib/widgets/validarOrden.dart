@@ -10,13 +10,16 @@ class ValidarOrdenPage extends StatefulWidget {
 
 class _ValidarOrdenPageState extends State<ValidarOrdenPage> {
   final TextEditingController _idController = TextEditingController();
-  final OrdenService ordenService = OrdenService(); // Debes tener este servicio implementado
+  final OrdenService ordenService =
+      OrdenService(); // Debes tener este servicio implementado
   String? _mensaje;
 
   void _verificarOrden() async {
     final prefs = await SharedPreferences.getInstance();
     final int? usuarioId = prefs.getInt('usuarioId');
     final idIngresado = int.tryParse(_idController.text.trim());
+    print('usuarioId guardado en SharedPreferences: $usuarioId');
+    print('Id ingresado: $idIngresado');
 
     if (usuarioId == null || idIngresado == null) {
       setState(() => _mensaje = 'Datos inválidos');
@@ -25,17 +28,23 @@ class _ValidarOrdenPageState extends State<ValidarOrdenPage> {
 
     try {
       final ordenes = await ordenService.obtenerOrdenes();
+      print('Ordenes recibidas: $ordenes'); // DEBUG
+
       final orden = ordenes.firstWhere(
-        (o) => o['id'] == idIngresado && o['usuarioId'] == usuarioId,
+        (o) => o['id'] == idIngresado && o['clienteId'] == usuarioId,
         orElse: () => null,
       );
 
       if (orden == null) {
-        setState(() => _mensaje = 'Orden no encontrada o no pertenece al usuario');
+        setState(
+          () => _mensaje = 'Orden no encontrada o no pertenece al usuario',
+        );
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DetalleOrdenPage(orden: orden)),
+          MaterialPageRoute(
+            builder: (context) => DetalleOrdenPage(orden: orden),
+          ),
         );
       }
     } catch (e) {
@@ -58,14 +67,11 @@ class _ValidarOrdenPageState extends State<ValidarOrdenPage> {
               decoration: InputDecoration(labelText: 'ID de Orden'),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _verificarOrden,
-              child: Text('Validar'),
-            ),
+            ElevatedButton(onPressed: _verificarOrden, child: Text('Validar')),
             if (_mensaje != null) ...[
               SizedBox(height: 20),
               Text(_mensaje!, style: TextStyle(color: Colors.red)),
-            ]
+            ],
           ],
         ),
       ),

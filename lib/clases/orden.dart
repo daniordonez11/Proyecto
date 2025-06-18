@@ -1,5 +1,6 @@
 class Orden {
   final int usuarioId;
+  final int clienteId;  // <-- agregado
   final int id;
   final String nombreCliente;
   final int telefonoCliente;
@@ -13,6 +14,7 @@ class Orden {
 
   Orden({
     required this.usuarioId,
+    required this.clienteId,   // <-- agregado
     required this.id,
     required this.nombreCliente,
     required this.telefonoCliente,
@@ -28,6 +30,7 @@ class Orden {
   factory Orden.fromJson(Map<String, dynamic> json) {
     return Orden(
       usuarioId: int.tryParse(json['usuarioId'].toString()) ?? 0,
+      clienteId: int.tryParse(json['clienteId']?.toString() ?? '') ?? 0,  // <-- agregado
       id: int.tryParse(json['id'].toString()) ?? 0,
       nombreCliente: json['nombreCliente'] ?? '',
       telefonoCliente: int.tryParse(json['telefonoCliente'].toString()) ?? 0,

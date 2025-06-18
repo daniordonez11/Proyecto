@@ -205,7 +205,19 @@ class _editarOrdenState extends State<editarOrden> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: usuariosConAcceso.isEmpty
+      body: Stack(
+        children: [
+          SizedBox.expand(
+            child: Image.asset(
+              'assets/images/fondo.png',
+              width: double.infinity, // ancho máximo posible
+              height: double.infinity, // alto máximo posible
+              fit: BoxFit.fill,
+              color: Colors.black.withOpacity(0.5), // opacidad del fondo
+              colorBlendMode: BlendMode.darken, // modo de mezcla del color
+            ),
+          ),
+          usuariosConAcceso.isEmpty
           ? Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
@@ -367,6 +379,9 @@ class _editarOrdenState extends State<editarOrden> {
                 ),
               ),
             ),
+        ],
+      ),
     );
+
   }
 }

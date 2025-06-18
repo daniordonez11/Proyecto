@@ -95,17 +95,34 @@ class _DetalleOrdenPageState extends State<DetalleOrdenPage> {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detalle de Orden'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: cerrarSesion,
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
+      body: Stack(
+        children: [
+          SizedBox.expand(
+            child: Image.asset(
+              'assets/images/fondo.png',
+              width: double.infinity, // ancho máximo posible
+              height: double.infinity, // alto máximo posible
+              fit: BoxFit.fill,
+              color: Colors.black.withOpacity(0.5), // opacidad del fondo
+              colorBlendMode: BlendMode.darken, // modo de mezcla del color
+            ),
+          ),
+          Column(
+            children: [
+              AppBar(
+                title: const Text('Detalle de Orden'),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: cerrarSesion,
+                ),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView(
+                    children: [
             ...entradasFiltradas.map((entry) {
               return Card(
                 elevation: 3,
@@ -182,6 +199,12 @@ class _DetalleOrdenPageState extends State<DetalleOrdenPage> {
           ],
         ),
       ),
+            ),
+            ],
+          ),
+        ],
+      ),
+            
     );
   }
 }

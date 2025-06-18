@@ -75,52 +75,168 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      // El appBar puedes dejarlo, o quitar si quieres que la imagen cubra todo
       appBar: AppBar(title: const Text('Iniciar sesión'), centerTitle: true),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Image.asset('assets/images/jds.png', height: 150),
-              SizedBox(height: 24),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Correo electrónico',
-                ),
-                keyboardType: TextInputType.emailAddress,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? 'Ingrese el correo electrónico' : null,
-                onSaved: (value) => usuario = value ?? '',
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Contraseña'),
-                obscureText: true,
-                validator:
-                    (value) => value!.isEmpty ? 'Ingrese la contraseña' : null,
-                onSaved: (value) => contrasena = value ?? '',
-              ),
-              const SizedBox(height: 24),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : SizedBox(
-                    width: 200,
-                    height: 100,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
-                      icon: Icon(Icons.login),
-                      label: const Text('Acceder'),
-                      onPressed: _login,
-                    ),
-                  ),
-            ],
+      body: Stack(
+        children: [
+          SizedBox.expand(
+            child: Image.asset(
+              'assets/images/fondo.png',
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.fill,
+              color: Colors.black.withOpacity(0.5), // Opacidad para el fondo
+              colorBlendMode: BlendMode.darken, // Mezcla de color para el fondo
+            ),
           ),
-        ),
+
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 50),
+                    Image.asset('assets/images/jds.png', height: 150),
+                    const SizedBox(height: 50),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Correo electrónico',
+                        labelStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintText: 'ejemplo@correo.com',
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // bordes redondeados
+                          borderSide: BorderSide(color: Color(0xFF0B4B30)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          // borde cuando NO está seleccionado
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Color(0xFF0B4B30)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          // borde cuando está seleccionado
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Color(0xFF0B4B30),
+                            width: 2,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          // borde cuando hay error
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          // borde con error y foco
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2,
+                          ),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.email,
+                          color: Colors.black54,
+                        ), // ícono dentro del campo
+                        filled: true,
+                        fillColor: Color(0xFF0B4B30), // color de fondo
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      validator:
+                          (value) =>
+                              value!.isEmpty
+                                  ? 'Ingrese el correo electrónico'
+                                  : null,
+                      onSaved: (value) => usuario = value ?? '',
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Contraseña',
+                        labelStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintText: '••••••••',
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Color(0xFF0B4B30)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Color(0xFF0B4B30)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Color(0xFF0B4B30),
+                            width: 2,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2,
+                          ),
+                        ),
+                        prefixIcon: Icon(Icons.lock, color: Colors.black54),
+                        filled: true,
+                        fillColor: Color(0xFF0B4B30),
+                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      obscureText: true,
+                      cursorColor: Colors.white,
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Ingrese la contraseña' : null,
+                      onSaved: (value) => contrasena = value ?? '',
+                    ),
+
+                    const SizedBox(height: 24),
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : SizedBox(
+                          width: 200,
+                          height: 50,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF0B4B30),
+                              foregroundColor: Colors.white,
+                            ),
+                            icon: const Icon(Icons.login),
+                            label: const Text('Acceder'),
+                            onPressed: _login,
+                          ),
+                        ),
+                    const SizedBox(height: 50), // espacio abajo opcional
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
