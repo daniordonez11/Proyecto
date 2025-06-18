@@ -57,7 +57,8 @@ class _MenuPageState extends State<MenuPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Menú Principal - ID de Usuario: $usuarioId - Nombre: $nombre', style: TextStyle(fontSize: 8)),
+      appBar: AppBar(title: Text('Menú Principal - ID de Usuario: $usuarioId - Nombre: $nombre', style: TextStyle(fontSize: 14)),
+      centerTitle: true,
       actions: [
     IconButton(
       icon: const Icon(Icons.logout),
@@ -65,18 +66,79 @@ class _MenuPageState extends State<MenuPage> {
       onPressed: cerrarSesion,
     ),
   ],),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
+  drawer: Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        Image.asset(
               'assets/images/jds.png',
               height: 100,
             ),
-            const SizedBox(height: 100),
+        const DrawerHeader(
+          decoration: BoxDecoration(
+            color: Colors.green,
+          ),
+          child: Text(
+            'Menú',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ListTile(
+          title: const Text('Crear una Orden'),
+          onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegistroEquipos()),
+                  );
+                },
+        ),
+        ListTile(
+          title: const Text('Clasificacion de Ordenes'),
+          onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => VerOrdenesPage()),
+                  );
+                },
+        ),
+        ListTile(
+          title: const Text('Inventario General'),
+          onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InventarioPage()),
+                  );
+                },
+        ),
+      ],
+    ),
+  ),
+      body: Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/fondo.jpeg"),
+            ),
+          ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/images/jds.png',
+                height: 100,
+              ),
+              const SizedBox(height: 100),
 
             if (accesoTotal == true) ...[
               ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
                 icon: const Icon(Icons.computer),
                 label: const Text('Registrar equipo'),
                 onPressed: () {
@@ -88,6 +150,10 @@ class _MenuPageState extends State<MenuPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
                 icon: const Icon(Icons.list_alt),
                 label: const Text('Clasificacion de Ordenes'),
                 onPressed: () {
@@ -100,6 +166,10 @@ class _MenuPageState extends State<MenuPage> {
               const SizedBox(height: 20),
             ],
             ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
               icon: const Icon(Icons.search),
               label: const Text('Buscar Orden'),
               onPressed: () {
@@ -111,6 +181,10 @@ class _MenuPageState extends State<MenuPage> {
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
               icon: const Icon(Icons.inventory),
               label: const Text('Ver Inventario'),
               onPressed: () {
@@ -123,6 +197,7 @@ class _MenuPageState extends State<MenuPage> {
           ],
         ),
       ),
+    ),
     );
   }
 }

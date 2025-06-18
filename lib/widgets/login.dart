@@ -8,7 +8,6 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   @override
   _LoginPageState createState() => _LoginPageState();
-  
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -48,26 +47,25 @@ class _LoginPageState extends State<LoginPage> {
           await prefs.setBool('accesoTotal', usuarioEncontrado['accesoTotal']);
           await prefs.setString('nombre', usuarioEncontrado['nombre']);
           if (usuarioEncontrado['accesoTotal'] == true) {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MenuPage()),
-          );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const MenuPage()),
+            );
           } else {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => ValidarOrdenPage()),
-          );   
-        }
-
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => ValidarOrdenPage()),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Contraseña incorrecta')),
           );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error de conexión: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error de conexión: $e')));
       }
 
       setState(() => _isLoading = false);
@@ -77,39 +75,49 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Iniciar sesión')),
+      
+      appBar: AppBar(title: const Text('Iniciar sesión'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              Image.asset(
-                'assets/images/jds.png',
-                height: 150,
-              ),
+              Image.asset('assets/images/jds.png', height: 150),
               SizedBox(height: 24),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                decoration: const InputDecoration(
+                  labelText: 'Correo electrónico',
+                ),
                 keyboardType: TextInputType.emailAddress,
-                validator: (value) =>
-                    value!.isEmpty ? 'Ingrese el correo electrónico' : null,
+                validator:
+                    (value) =>
+                        value!.isEmpty ? 'Ingrese el correo electrónico' : null,
                 onSaved: (value) => usuario = value ?? '',
               ),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Contraseña'),
                 obscureText: true,
-                validator: (value) =>
-                    value!.isEmpty ? 'Ingrese la contraseña' : null,
+                validator:
+                    (value) => value!.isEmpty ? 'Ingrese la contraseña' : null,
                 onSaved: (value) => contrasena = value ?? '',
               ),
               const SizedBox(height: 24),
               _isLoading
                   ? const CircularProgressIndicator()
-                  : ElevatedButton(
+                  : SizedBox(
+                    width: 200,
+                    height: 100,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: Icon(Icons.login),
+                      label: const Text('Acceder'),
                       onPressed: _login,
-                      child: const Text('Acceder'),
                     ),
+                  ),
             ],
           ),
         ),
