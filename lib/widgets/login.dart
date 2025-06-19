@@ -102,6 +102,10 @@ class _LoginPageState extends State<LoginPage> {
                     Image.asset('assets/images/jds.png', height: 150),
                     const SizedBox(height: 50),
                     TextFormField(
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ), 
                       decoration: InputDecoration(
                         labelText: 'Correo electrónico',
                         labelStyle: TextStyle(
@@ -115,18 +119,14 @@ class _LoginPageState extends State<LoginPage> {
                           fontStyle: FontStyle.italic,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            12,
-                          ), // bordes redondeados
+                          borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: Color(0xFF0B4B30)),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          // borde cuando NO está seleccionado
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: Color(0xFF0B4B30)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          // borde cuando está seleccionado
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
                             color: Color(0xFF0B4B30),
@@ -134,24 +134,19 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         errorBorder: OutlineInputBorder(
-                          // borde cuando hay error
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: Colors.red),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
-                          // borde con error y foco
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
                             color: Colors.redAccent,
                             width: 2,
                           ),
                         ),
-                        prefixIcon: Icon(
-                          Icons.email,
-                          color: Colors.black54,
-                        ), // ícono dentro del campo
+                        prefixIcon: Icon(Icons.email, color: Colors.yellowAccent),
                         filled: true,
-                        fillColor: Color(0xFF0B4B30), // color de fondo
+                        fillColor: Color(0xFF0B4B30),
                       ),
                       keyboardType: TextInputType.emailAddress,
                       validator:
@@ -163,6 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
+                      
                       decoration: InputDecoration(
                         labelText: 'Contraseña',
                         labelStyle: TextStyle(
@@ -170,9 +166,9 @@ class _LoginPageState extends State<LoginPage> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
-                        hintText: '••••••••',
+                        hintText: 'Contraseña.5',
                         hintStyle: TextStyle(
-                          color: Colors.grey,
+                          color: Colors.white,
                           fontStyle: FontStyle.italic,
                         ),
                         border: OutlineInputBorder(
@@ -201,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: 2,
                           ),
                         ),
-                        prefixIcon: Icon(Icons.lock, color: Colors.black54),
+                        prefixIcon: Icon(Icons.lock, color: Colors.yellowAccent),
                         filled: true,
                         fillColor: Color(0xFF0B4B30),
                       ),
@@ -225,8 +221,8 @@ class _LoginPageState extends State<LoginPage> {
                               backgroundColor: Color(0xFF0B4B30),
                               foregroundColor: Colors.white,
                             ),
-                            icon: const Icon(Icons.login),
-                            label: const Text('Acceder'),
+                            icon: const Icon(Icons.login, size: 28, color: Colors.yellowAccent),
+                            label: const Text('Acceder', style: TextStyle(fontSize: 20),),
                             onPressed: _login,
                           ),
                         ),

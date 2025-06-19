@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/clases/item.dart';
-import 'package:proyecto1/servicios/itemService.dart'; // Asegúrate de tener este archivo
+import 'package:proyecto1/servicios/itemService.dart';
+import 'package:proyecto1/widgets/editarItem.dart'; // Asegúrate de tener este archivo
 
 class InventarioPage extends StatefulWidget {
   const InventarioPage({Key? key}) : super(key: key);
@@ -27,9 +28,7 @@ class _InventarioPageState extends State<InventarioPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inventario'),
-      ),
+      appBar: AppBar(title: const Text('Inventario')),
       body: FutureBuilder<List<Inventario>>(
         future: _inventarioFuture,
         builder: (context, snapshot) {
@@ -50,7 +49,10 @@ class _InventarioPageState extends State<InventarioPage> {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: ListTile(
-                  title: Text(item.descripcion, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(
+                    item.descripcion,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -58,6 +60,20 @@ class _InventarioPageState extends State<InventarioPage> {
                       Text('Observación: ${item.observacion}'),
                     ],
                   ),
+                  onTap: () async {
+                    final actualizado = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditarItemPage(item: item),
+                      ),
+                    );
+
+                    if (actualizado == true) {
+                      setState(() {
+                        _inventarioFuture = cargarInventario();
+                      });
+                    }
+                  },
                 ),
               );
             },

@@ -176,148 +176,199 @@ class _RegistroEquiposState extends State<RegistroEquipos> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Ingresar Nueva Orden'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+Widget build(BuildContext context) {
+  final estiloInput = InputDecorationTheme(
+    filled: true,
+    fillColor: Colors.white.withOpacity(0.9),
+    labelStyle: const TextStyle(color: Colors.black87),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    focusedBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Color(0xFF0B4B30), width: 2),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.grey),
+      borderRadius: BorderRadius.circular(12),
+    ),
+  );
+
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Ingresar Nueva Orden'),
+      backgroundColor: const Color(0xFF0B4B30),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => Navigator.pop(context),
       ),
-      body: 
-      Stack(
-        children: [
-          SizedBox.expand(
-            child: Image.asset(
-              'assets/images/fondo.png',
-              width: double.infinity, // ancho máximo posible
-              height: double.infinity, // alto máximo posible
-              fit: BoxFit.fill,
-              color: Colors.black.withOpacity(0.5), // opacidad del fondo
-              colorBlendMode: BlendMode.darken, // modo de mezcla del color
-            ),
+    ),
+    body: Stack(
+      children: [
+        SizedBox.expand(
+          child: Image.asset(
+            'assets/images/fondo.png',
+            fit: BoxFit.cover,
+            color: Colors.black.withOpacity(0.5),
+            colorBlendMode: BlendMode.darken,
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+        ),
+        Theme(
+          data: Theme.of(context).copyWith(inputDecorationTheme: estiloInput),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
-              child: ListView(
+              child: Column(
                 children: [
-              DropdownButtonFormField<int>(
-                decoration: InputDecoration(labelText: 'Técnico responsable'),
-                value: usuarioIdSeleccionado,
-                items: usuariosConAcceso.map((usuario) {
-                  return DropdownMenuItem<int>(
-                    value: usuario['id'],
-                    child: Text(usuario['nombre']),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    usuarioIdSeleccionado = value;
-                  });
-                },
-                validator:
-                    (value) => value == null ? 'Seleccione un técnico' : null,
-              ),
-              TextFormField(
-                controller: nombreController,
-                decoration: InputDecoration(labelText: 'Nombre del cliente'),
-                validator:
-                    (value) => value!.isEmpty ? 'Ingrese el nombre' : null,
-              ),
-              TextFormField(
-                controller: telefonoController,
-                decoration: InputDecoration(labelText: 'Teléfono'),
-                keyboardType: TextInputType.number,
-                validator:
-                    (value) => value!.isEmpty ? 'Ingrese el teléfono' : null,
-              ),
-              TextFormField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: 'Correo electrónico'),
-                keyboardType: TextInputType.emailAddress,
-                validator:
-                    (value) => value!.isEmpty ? 'Ingrese el correo' : null,
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Fecha de ingreso: ${fechaHora.toLocal().toString().split(' ')[0]}',
-              ),
-              ElevatedButton(
-                onPressed: () => _seleccionarFecha(context),
-                child: Text('Seleccionar fecha'),
-              ),
-              TextFormField(
-                controller: modeloController,
-                decoration: InputDecoration(labelText: 'Marca y modelo'),
-                validator:
-                    (value) => value!.isEmpty ? 'Ingrese la marca y modelo' : null,
-              ),
-              TextFormField(
-                controller: serieController,
-                decoration: InputDecoration(labelText: 'Número de serie o ID'),
-                keyboardType: TextInputType.number,
-                validator:
-                    (value) => value!.isEmpty ? 'Ingrese el número de serie' : null,
-              ),
-              TextFormField(
-                controller: estadoController,
-                decoration: InputDecoration(labelText: 'Estado inicial'),
-                maxLines: 3,
-              ),
-              ElevatedButton.icon(
-                onPressed: seleccionarImagenes,
-                icon: Icon(Icons.photo_library),
-                label: Text('Seleccionar imágenes'),
-              ),
-              imagenesSeleccionadas.isEmpty
-                  ? Text('No hay imágenes seleccionadas')
-                  : SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: imagenesSeleccionadas.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Image.file(imagenesSeleccionadas[index]),
-                          );
-                        },
+                  DropdownButtonFormField<int>(
+                    decoration: const InputDecoration(labelText: 'Técnico responsable'),
+                    value: usuarioIdSeleccionado,
+                    items: usuariosConAcceso.map((usuario) {
+                      return DropdownMenuItem<int>(
+                        value: usuario['id'],
+                        child: Text(usuario['nombre']),
+                      );
+                    }).toList(),
+                    onChanged: (value) => setState(() => usuarioIdSeleccionado = value),
+                    validator: (value) => value == null ? 'Seleccione un técnico' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: nombreController,
+                    decoration: const InputDecoration(labelText: 'Nombre del cliente'),
+                    validator: (value) => value!.isEmpty ? 'Ingrese el nombre' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: telefonoController,
+                    decoration: const InputDecoration(labelText: 'Teléfono'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) => value!.isEmpty ? 'Ingrese el teléfono' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) => value!.isEmpty ? 'Ingrese el correo' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Fecha de ingreso: ${fechaHora.toLocal().toString().split(' ')[0]}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _seleccionarFecha(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0B4B30),
+                        ),
+                        child: const Text('Seleccionar fecha'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: modeloController,
+                    decoration: const InputDecoration(labelText: 'Marca y modelo'),
+                    validator: (value) => value!.isEmpty ? 'Ingrese la marca y modelo' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: serieController,
+                    decoration: const InputDecoration(labelText: 'Número de serie o ID'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) => value!.isEmpty ? 'Ingrese el número de serie' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: estadoController,
+                    decoration: const InputDecoration(labelText: 'Estado inicial'),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: seleccionarImagenes,
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Seleccionar imágenes', style: TextStyle(color: Colors.white),),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0B4B30),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (imagenesSeleccionadas.isNotEmpty)
+                    Card(
+                      color: Colors.white70,
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: SizedBox(
+                          height: 100,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: imagenesSeleccionadas.length,
+                            itemBuilder: (context, index) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(imagenesSeleccionadas[index]),
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
-              SizedBox(height: 16),
-              Text('Accesorios entregados'),
-              ...accesoriosOpciones.map((item) {
-                return CheckboxListTile(
-                  title: Text(item),
-                  value: accesoriosSeleccionados.contains(item),
-                  onChanged: (bool? selected) {
-                    setState(() {
-                      if (selected == true) {
-                        accesoriosSeleccionados.add(item);
-                      } else {
-                        accesoriosSeleccionados.remove(item);
-                      }
-                    });
-                  },
-                );
-              }).toList(),
-              SizedBox(height: 16),
-              ElevatedButton.icon(
-                icon: Icon(Icons.save),
-                label: Text('Guardar Orden'),
-                onPressed: guardarOrden,
+                  const SizedBox(height: 16),
+                  Card(
+                    color: Colors.white.withOpacity(0.9),
+                    elevation: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Accesorios entregados', style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          ...accesoriosOpciones.map((item) {
+                            return CheckboxListTile(
+                              activeColor: const Color(0xFF0B4B30),
+                              title: Text(item),
+                              value: accesoriosSeleccionados.contains(item),
+                              onChanged: (bool? selected) {
+                                setState(() {
+                                  if (selected == true) {
+                                    accesoriosSeleccionados.add(item);
+                                  } else {
+                                    accesoriosSeleccionados.remove(item);
+                                  }
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.save),
+                    label: const Text('Guardar Orden'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0B4B30),
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      textStyle: const TextStyle(fontSize: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: guardarOrden,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
-        ],
-      ),
-      
-    );
-
-  }
+      ],
+    ),
+  );
 }
+}
+
