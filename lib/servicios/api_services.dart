@@ -4,8 +4,8 @@ import 'dart:convert';
 class ApiService {
   //10.0.2.2 PARA EMULACION
   //localhost para emular web
-  // ip de pc para emular movil fisico: 192.168.1.17
-  static const String baseUrl = 'http://10.0.2.2:3000/api/v1/auth/';
+  // ip de pc para emular movil fisico: 192.168.1.2
+  static const String baseUrl = 'http://192.168.1.2:3000/api/v1/auth/';
 
   // Encabezados comunes
   Map<String, String> headers = {
