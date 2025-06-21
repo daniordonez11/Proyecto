@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/clases/orden.dart';
 import 'package:proyecto1/servicios/orderService.dart';
-import 'package:proyecto1/widgets/editarOrden.dart';
+import 'package:proyecto1/widgets/modificarOrdenes/editarOrden.dart';
 
 class VerOrdenesPage extends StatefulWidget {
   const VerOrdenesPage({super.key});

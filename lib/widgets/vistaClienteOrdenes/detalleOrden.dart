@@ -31,7 +31,6 @@ class _DetalleOrdenPageState extends State<DetalleOrdenPage> {
       errorImagenes = null;
     });
     try {
-      // Convierte el id a int, asumiendo que viene como String o dynamic
       int ordenId = widget.orden['id'] is int
           ? widget.orden['id']
           : int.parse(widget.orden['id'].toString());
@@ -100,17 +99,18 @@ class _DetalleOrdenPageState extends State<DetalleOrdenPage> {
           SizedBox.expand(
             child: Image.asset(
               'assets/images/fondo.png',
-              width: double.infinity, // ancho máximo posible
-              height: double.infinity, // alto máximo posible
+              width: double.infinity, 
+              height: double.infinity, 
               fit: BoxFit.fill,
-              color: Colors.black.withOpacity(0.5), // opacidad del fondo
-              colorBlendMode: BlendMode.darken, // modo de mezcla del color
+              color: Colors.black.withOpacity(0.5), 
+              colorBlendMode: BlendMode.darken, 
             ),
           ),
           Column(
             children: [
               AppBar(
-                title: const Text('Detalle de Orden'),
+                iconTheme: const IconThemeData(color: Colors.white),
+                title: const Text('Detalle de Orden', style: TextStyle(color: Colors.white)),
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: cerrarSesion,

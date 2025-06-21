@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/clases/item.dart';
 import 'package:proyecto1/servicios/itemService.dart';
+import 'package:proyecto1/stream/stream.dart';
 
 class EditarItemPage extends StatefulWidget {
   final Inventario item;
@@ -15,6 +16,8 @@ class _EditarItemPageState extends State<EditarItemPage> {
   late int cantidad;
   late TextEditingController observacionController;
   final ItemService itemService = ItemService();
+
+  final OrdenInventarioNotifier notifier = OrdenInventarioNotifier();
 
   @override
   void initState() {
@@ -37,6 +40,9 @@ class _EditarItemPageState extends State<EditarItemPage> {
 
     try {
       await itemService.actualizarItem(widget.item.id, data);
+
+      await notifier.actualizarInventario();
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ítem actualizado correctamente')),
       );

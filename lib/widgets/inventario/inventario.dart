@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/clases/item.dart';
 import 'package:proyecto1/servicios/itemService.dart';
-import 'package:proyecto1/widgets/editarItem.dart'; // Asegúrate de tener este archivo
+import 'package:proyecto1/widgets/inventario/editarItem.dart'; // Asegúrate de tener este archivo
 
 class InventarioPage extends StatefulWidget {
   const InventarioPage({Key? key}) : super(key: key);

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/clases/item.dart';
-import 'package:proyecto1/clases/orden.dart';
-import 'package:proyecto1/servicios/itemService.dart';
-import 'package:proyecto1/servicios/orderService.dart';
-import 'package:proyecto1/widgets/buscar.dart';
-import 'package:proyecto1/widgets/ingreso.dart';
-import 'package:proyecto1/widgets/inventario.dart';
+import 'package:proyecto1/clases/orden.dart'; // Aquí está OrdenInventarioNotifier
+import 'package:proyecto1/stream/stream.dart';
+import 'package:proyecto1/widgets/modificarOrdenes/buscar.dart';
+import 'package:proyecto1/widgets/modificarOrdenes/ingreso.dart';
+import 'package:proyecto1/widgets/inventario/inventario.dart';
 import 'package:proyecto1/widgets/login.dart';
-import 'package:proyecto1/widgets/ordenes.dart';
-import 'package:proyecto1/widgets/editarOrden.dart';
+import 'package:proyecto1/widgets/modificarOrdenes/ordenes.dart';
+import 'package:proyecto1/widgets/modificarOrdenes/editarOrden.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuPage extends StatefulWidget {
@@ -23,9 +22,9 @@ class _MenuPageState extends State<MenuPage> {
   int? usuarioId;
   String? nombre;
 
-  late Future<List<Inventario>> _inventarioBajoFuture;
-  List<Orden> todasOrdenes = [];
-  bool cargandoOrdenes = true;
+  final notifier = OrdenInventarioNotifier();
+
+  late final Stream<int> _streamAlternar;
 
   final List<String> categorias = [
     'Recien llegado',
@@ -38,17 +37,10 @@ class _MenuPageState extends State<MenuPage> {
   void initState() {
     super.initState();
     cargarDatosUsuario();
-    cargarOrdenesRecientes();
-    _inventarioBajoFuture = obtenerInventarioBajo();
+    notifier.actualizarInventario();
+    notifier.actualizarOrdenes();
+    _streamAlternar = Stream.periodic(const Duration(seconds: 3), (i) => i);
   }
-
-  Future<List<Inventario>> obtenerInventarioBajo() async {
-  final items = await ItemService().obtenerItems();
-  return items
-      .map((e) => Inventario.fromJson(e))
-      .where((item) => item.cantidad < 5)
-      .toList();
-}
 
   Future<void> cargarDatosUsuario() async {
     final prefs = await SharedPreferences.getInstance();
@@ -59,38 +51,35 @@ class _MenuPageState extends State<MenuPage> {
     });
   }
 
-  Future<void> cargarOrdenesRecientes() async {
-    try {
-      final data = await OrdenService().obtenerOrdenes();
-      final ordenes = data.map<Orden>((json) => Orden.fromJson(json)).toList();
-
-      ordenes.sort(
-        (a, b) => b.fechaHora.compareTo(a.fechaHora),
-      ); // más recientes primero
-
-      setState(() {
-        todasOrdenes = ordenes;
-        cargandoOrdenes = false;
-      });
-    } catch (e) {
-      setState(() {
-        cargandoOrdenes = false;
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al cargar órdenes: $e')));
-    }
-  }
-
   void cerrarSesion() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    if (mounted) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false,
-      );
+    final confirmacion = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar cierre de sesión'),
+        content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Cerrar sesión'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmacion == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -103,29 +92,41 @@ class _MenuPageState extends State<MenuPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF0B4B30),
-        title: Row(
-          children: [
-            Image.asset('assets/images/jds.png', height: 40),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Bienvenido, $nombre',
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: StreamBuilder<int>(
+          stream: _streamAlternar,
+          builder: (context, snapshot) {
+            final mostrarImagen = (snapshot.data ?? 0) % 2 == 0;
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              child: mostrarImagen
+                  ? Image.asset(
+                      'assets/images/jds.png',
+                      key: const ValueKey('imagen'),
+                      height: 40,
+                    )
+                  : Text(
+                      'Bienvenido $nombre',
+                      key: const ValueKey('texto'),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+            );
+          },
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            tooltip: 'Cerrar sesión',
+            icon: const Icon(Icons.logout),
             onPressed: cerrarSesion,
-          ),
+            tooltip: 'Cerrar sesión',
+          )
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Colors.white.withOpacity(0.95),
+        shadowColor: Colors.black54,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -185,9 +186,6 @@ class _MenuPageState extends State<MenuPage> {
                   context,
                   MaterialPageRoute(builder: (_) => InventarioPage()),
                 );
-                setState(() {
-      _inventarioBajoFuture = obtenerInventarioBajo();
-    });
               },
             ),
           ],
@@ -254,8 +252,10 @@ class _MenuPageState extends State<MenuPage> {
                     );
                   }),
                   const SizedBox(height: 30),
-                  FutureBuilder<List<Inventario>>(
-                    future: _inventarioBajoFuture,
+
+                  // Aquí inventario bajo en tiempo real con StreamBuilder
+                  StreamBuilder<List<Inventario>>(
+                    stream: notifier.inventarioStream,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -265,7 +265,7 @@ class _MenuPageState extends State<MenuPage> {
                           style: const TextStyle(color: Colors.white),
                         );
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const SizedBox(); // No mostrar nada si no hay stock bajo
+                        return const SizedBox();
                       }
 
                       final inventarioBajo = snapshot.data!;
@@ -305,78 +305,100 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  if (!cargandoOrdenes) ...[
-                    Text(
-                      'Órdenes más recientes por estado',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [Shadow(color: Colors.black, blurRadius: 4)],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...categorias.map((categoria) {
-                      final filtradas =
-                          todasOrdenes
-                              .where((o) => o.estado == categoria)
-                              .take(3)
-                              .toList();
+                  // Órdenes en tiempo real con StreamBuilder
+                  StreamBuilder<List<Orden>>(
+                    stream: notifier.ordenesStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text(
+                          'Error al cargar órdenes: ${snapshot.error}',
+                          style: const TextStyle(color: Colors.white),
+                        );
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Text(
+                          'No hay órdenes recientes',
+                          style: TextStyle(color: Colors.white),
+                        );
+                      }
 
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        color: Colors.white.withOpacity(0.95),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                categoria,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF0B4B30),
+                      final todasOrdenes = snapshot.data!;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Órdenes más recientes por estado',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              shadows: [Shadow(color: Colors.black, blurRadius: 4)],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          ...categorias.map((categoria) {
+                            final filtradas = todasOrdenes
+                                .where((o) => o.estado == categoria)
+                                .take(3)
+                                .toList();
+
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              color: Colors.white.withOpacity(0.95),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      categoria,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF0B4B30),
+                                      ),
+                                    ),
+                                    const Divider(),
+                                    if (filtradas.isEmpty)
+                                      Text(
+                                        'Sin órdenes recientes',
+                                        style: TextStyle(color: Colors.black54),
+                                      )
+                                    else
+                                      ...filtradas.map(
+                                        (orden) => ListTile(
+                                          dense: true,
+                                          leading: Icon(
+                                            Icons.assignment,
+                                            color: Colors.grey[700],
+                                          ),
+                                          title: Text(
+                                            'Orden #${orden.id} - ${orden.nombreCliente}',
+                                          ),
+                                          subtitle: Text(
+                                            'Fecha: ${orden.fechaHora.toLocal().toString().split(".")[0]}',
+                                          ),
+                                          onTap: () async {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => editarOrden(orden: orden),
+                                              ),
+                                            );
+                                            notifier.actualizarOrdenes();
+                                          },
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
-                              const Divider(),
-                              if (filtradas.isEmpty)
-                                Text(
-                                  'Sin órdenes recientes',
-                                  style: TextStyle(color: Colors.black54),
-                                )
-                              else
-                                ...filtradas.map(
-                                  (orden) => ListTile(
-                                    dense: true,
-                                    leading: Icon(
-                                      Icons.assignment,
-                                      color: Colors.grey[700],
-                                    ),
-                                    title: Text(
-                                      'Orden #${orden.id} - ${orden.nombreCliente}',
-                                    ),
-                                    subtitle: Text(
-                                      'Fecha: ${orden.fechaHora.toLocal().toString().split(".")[0]}',
-                                    ),
-                                    onTap: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (_) => editarOrden(orden: orden),
-                                        ),
-                                      );
-                                      await cargarOrdenesRecientes();
-                                    },
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
+                            );
+                          }).toList(),
+                        ],
                       );
-                    }).toList(),
-                  ],
+                    },
+                  ),
                 ],
               ),
             ),

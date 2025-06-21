@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/servicios/orderService.dart';
-import 'package:proyecto1/widgets/detalleOrden.dart';
+import 'package:proyecto1/widgets/vistaClienteOrdenes/detalleOrden.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ValidarOrdenPage extends StatefulWidget {

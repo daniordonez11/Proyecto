@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto1/servicios/userService.dart';
 import 'package:proyecto1/widgets/menu.dart';
-import 'package:proyecto1/widgets/validarOrden.dart';
+import 'package:proyecto1/widgets/vistaClienteOrdenes/validarOrden.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
